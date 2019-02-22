@@ -6,15 +6,17 @@ pub struct VM {
     pc: usize,
     program: Vec<u8>,
     pub remainder: u32,
+    pub zero_flag: bool
 }
 
 impl VM {
-	pub fn new(program: Vec<u8>) -> VM {
+	pub fn new() -> VM {
     	VM {
     		registers: [0; 32],
     		pc: 0,
-    		program: program,
+    		program: vec![],
     		remainder: 0,
+    		zero_flag: false,
     	}
 	}
 
@@ -73,6 +75,59 @@ impl VM {
 	            	let value = self.next_16_bits() as usize;
 	            	self.pc = value;
 	            },
+	            Opcode::EQ => {
+				    if self.registers[self.next_8_bits() as usize] == self.registers[self.next_8_bits() as usize] {
+				    	self.zero_flag = true;
+				    } else {				    	
+				    	self.zero_flag = false;
+				    }
+	            },
+	            Opcode::NEQ => {
+				    if self.registers[self.next_8_bits() as usize] != self.registers[self.next_8_bits() as usize] {
+				    	self.zero_flag = true;
+				    } else {
+				    	self.zero_flag = false;
+				    }
+	            },
+	            Opcode::LT => {
+					if self.registers[self.next_8_bits() as usize] < self.registers[self.next_8_bits() as usize] {
+				    	self.zero_flag = true;
+				    } else {
+				    	self.zero_flag = false;
+				    }
+	            },
+	            Opcode::GT => {
+	            	if self.registers[self.next_8_bits() as usize] > self.registers[self.next_8_bits() as usize] {
+				    	self.zero_flag = true;
+				    } else {
+				    	self.zero_flag = false;
+				    }
+
+	            },
+	            Opcode::LTQ => {
+					if self.registers[self.next_8_bits() as usize] <= self.registers[self.next_8_bits() as usize] {
+				    	self.zero_flag = true;
+				    } else {
+				    	self.zero_flag = false;
+				    }
+	            },
+	            Opcode::GTQ => {
+	            	if self.registers[self.next_8_bits() as usize] >= self.registers[self.next_8_bits() as usize] {
+				    	self.zero_flag = true;
+				    } else {
+				    	self.zero_flag = false;
+				    }
+	            },
+	            Opcode::JE => {
+	            	if self.zero_flag {
+	            		self.pc += self.next_8_bits() as usize
+	            	}
+	            },
+	            Opcode::JNE => {
+	            	if !self.zero_flag {
+	            		self.pc += self.next_8_bits() as usize
+	            	}
+	            },
 	            _ => {
 	              println!("Unrecognized opcode found! Terminating!");
 	              return;
@@ -105,5 +160,7 @@ mod tests {
 	use super::*;
 
 	#[test]
-	
+	fn test() {
+
+	}
 }
